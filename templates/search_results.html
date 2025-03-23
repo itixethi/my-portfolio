@@ -12,6 +12,10 @@
     </div>
   </form>
 
+  {% if query and not (drivers or teams) %}
+    <div class="alert alert-warning">No results found for "{{ query }}".</div>
+  {% endif %}
+
   {% if drivers or teams %}
     <h4>Results for "{{ query }}":</h4>
 
@@ -28,7 +32,7 @@
       </ul>
     {% endif %}
 
-    {% if teams %}
+    {% if teams and teams|length > 0 %}
       <h5>Teams</h5>
       <ul class="list-group">
         {% for team in teams %}
@@ -39,6 +43,8 @@
           </li>
         {% endfor %}
       </ul>
+    {% elif query %}
+      <p class="text-muted">No teams matched your search.</p>
     {% endif %}
   {% endif %}
 </div>

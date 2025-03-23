@@ -15,7 +15,7 @@ async def globalSearch(request: Request, templates: Jinja2Templates):
         user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
         isAuthorized = user_token is not None
 
-        query = request.query_params.get("query", "").strip()
+        query = request.query_params.get("query", "").strip().lower()
 
         if not query:
             return templates.TemplateResponse("search_results.html", {
@@ -26,12 +26,21 @@ async def globalSearch(request: Request, templates: Jinja2Templates):
                 "teams": []
             })
 
-        # Search both drivers and teams collections by Name
-        driver_stream = firestore_db.collection("drivers").where("Name", "==", query).stream()
-        team_stream = firestore_db.collection("teams").where("Name", "==", query).stream()
+        # Perform case-insensitive matching in Python after fetching all
+        driver_stream = firestore_db.collection("drivers").stream()
+        team_stream = firestore_db.collection("teams").stream()
 
-        drivers = [{"id": doc.id, **doc.to_dict()} for doc in driver_stream]
-        teams = [{"id": doc.id, **doc.to_dict()} for doc in team_stream]
+        drivers = [
+            {"id": doc.id, **doc.to_dict()}
+            for doc in driver_stream
+            if query in doc.to_dict().get("Name", "").lower()
+        ]
+
+        teams = [
+            {"id": doc.id, **doc.to_dict()}
+            for doc in team_stream
+            if query in doc.to_dict().get("Name", "").lower()
+        ]
 
         return templates.TemplateResponse("search_results.html", {
             "request": request,
