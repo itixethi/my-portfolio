@@ -3,7 +3,7 @@ import google.oauth2.id_token
 from google.auth.transport import requests
 from google.cloud import firestore
 import starlette.status as status
-
+from google.auth.exceptions import RefreshError
 
 firestore_db = firestore.Client()
 
