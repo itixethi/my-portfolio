@@ -1,0 +1,49 @@
+{% include 'abstracts/head.html' %}
+<div class="w-full">
+  {% include 'abstracts/menu.html' %}
+  <main class="main-content container">
+    <h2 class="mb-4">Formula 1 Drivers</h2>
+    {% for driver in drivers %}
+      {% if loop.index0 % 4 == 0 %}<div class="row g-2">{% endif %}
+        <div class="col-3">
+          <div class="card">
+            <div class="card-body">
+              <a href="/driver-info/{{driver.id}}">
+                <h5 class="card-title">{{ driver.Name }}</h5>
+              </a>
+              <h6 class="card-subtitle mb-2 text-body-secondary">Team: {{driver.Team}}</h6>
+              <ul class="list-group mb-3">
+                <li class="list-group-item">Age: {{driver.Age}}</li>
+                <li class="list-group-item">Wins: {{driver.TotalRaceWins}}</li>
+                <li class="list-group-item">Points: {{driver.TotalPointsScored}}</li>
+              </ul>
+              <a href="#" class="card-link delete-link" data-driver-id="{{driver.id}}">Delete</a>
+            </div>
+          </div>
+        </div>
+      {% if loop.index0 % 4 == 3 or loop.last %}</div>{% endif %}
+    {% endfor %}
+
+    <h2 class="mb-4 mt-5">Formula 1 Teams</h2>
+    {% for team in teams %}
+      {% if loop.index0 % 4 == 0 %}<div class="row g-2">{% endif %}
+        <div class="col-3">
+          <div class="card">
+            <div class="card-body">
+              <a href="/team-info/{{team.id}}">
+                <h5 class="card-title">{{ team.Name }}</h5>
+              </a>
+              <h6 class="card-subtitle mb-2 text-body-secondary">Founded: {{team.YearFounded}}</h6>
+              <ul class="list-group mb-3">
+                <li class="list-group-item">Wins: {{team.TotalRaceWins}}</li>
+                <li class="list-group-item">Constructor Titles: {{team.TotalConstructorTitles}}</li>
+              </ul>
+              <a href="#" class="card-link delete-link" data-team-id="{{team.id}}">Delete</a>
+            </div>
+          </div>
+        </div>
+      {% if loop.index0 % 4 == 3 or loop.last %}</div>{% endif %}
+    {% endfor %}
+  </main>
+</div>
+{% include 'abstracts/footer.html' %}
