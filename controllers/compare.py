@@ -48,6 +48,5 @@ async def compareDriversPost(request: Request):
 
     return RedirectResponse(url=f"/compare-drivers?driver1={driver1_id}&driver2={driver2_id}", status_code=302)
 
-# result view no longer needed, handled in compareDriversView
 async def compareDriversResult(request: Request, templates: Jinja2Templates):
     return await compareDriversView(request=request, templates=templates)

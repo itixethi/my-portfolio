@@ -1,22 +1,26 @@
-from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 import google.oauth2.id_token
 from google.auth.transport import requests
 from google.cloud import firestore
-import starlette.status as status
+from google.auth.exceptions import RefreshError
 
+from controllers.search import globalSearch
 from firebase.helpers import validateFirebaseToken
-from controllers.login import validateFirebaseToken
-from controllers.search import perform_driver_query, perform_team_query
+from controllers.login import login
+from controllers.driver import addDriverFormView, addDriverPost, viewDriverInfo, deleteDriver, updateDriver
+from controllers.team import addTeamFormView, addTeamPost, viewTeamInfo, deleteTeam, updateTeam
+from controllers.compare import compareDriversView, compareDriversPost, compareDriversResult
+from controllers.compare_teams import compareTeamsView, compareTeamsPost, compareTeamsResult
+from controllers.driver import editDriverFormView
+from controllers.query_teams import queryTeams
 
-# i call the app i shall use here 
 app = FastAPI()
 firestore_db = firestore.Client()
 firebase_request_adapter = requests.Request()
 
-# i set the static and templates folders here 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
@@ -24,18 +28,14 @@ def getUser(user_token):
     user = firestore_db.collection("users").document(user_token['user_id'])
     if not user.get().exists:
         user_data = {"name": "No name", "age": 0}
-
         user.set(user_data)
-        return user
-    
+    return user
+
 def checkAndReturnUser(id_token):
     user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
-    if not user_token:
-        return None
-    
-    return getUser(user_token)
+    return getUser(user_token) if user_token else None
 
-app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     try:
         id_token = request.cookies.get("token")
@@ -47,87 +47,86 @@ async def root(request: Request):
         drivers_data = [{"id": d.id, **d.to_dict()} for d in drivers]
         teams_data = [{"id": t.id, **t.to_dict()} for t in teams]
 
-        return templates.TemplateResponse(request=request, name="index.html", context={"isAuthorized": isAuthorized, "request": request, "drivers": drivers_data, "teams": teams_data})
+        return templates.TemplateResponse("index.html", {"request": request, "isAuthorized": isAuthorized, "drivers": drivers_data, "teams": teams_data})
     except Exception as e:
         return HTMLResponse(str(e), status_code=500)
-    
+
 @app.get("/login", response_class=HTMLResponse)
 async def handleLoginRoute(request: Request):
-    return templates.TemplateResponse("login.html", {"request": request, "isAuthorized": False})
-    #return await login(request=request, templates=templates)
+    return await login(request=request, templates=templates)
 
 @app.get("/add-driver", response_class=HTMLResponse)
-async def add_driver_form(request: Request):
-    id_token = request.cookies.get("token")
-    user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
-    if not user_token:
-        return RedirectResponse(url="/login", status_code=302)
-    return render_user_token(request, user_token, "add_driver.html")
+async def addDriverForm(request: Request):
+    return await addDriverFormView(request=request, templates=templates)
 
-@app.post("/add-driver")
-async def add_driver(
-    request: Request,
-    name: str = Form(...),
-    age: int = Form(...),
-    total_poles: int = Form(...),
-    total_wins: int = Form(...),
-    total_points: int = Form(...),
-    total_titles: int = Form(...),
-    total_fastest_laps: int = Form(...),
-    team: str = Form(...)
-):
-    driver_data = {
-        "Name": name, 
-        "Age": age,
-        "TotalPolePositions": total_poles,
-        "TotalRaceWins": total_wins,
-        "TotalPointsScored": total_points,
-        "TotalWorldTitles": total_titles,
-        "TotalFastestLaps": total_fastest_laps,
-        "Team": team
-    }
-    firestore_db.collection("drivers").add(driver_data)
-    return RedirectResponse(url="/", status_code=302)
+@app.post("/add-driver", response_class=RedirectResponse)
+async def handleAddDriverPost(request: Request):
+    return await addDriverPost(request=request)
+
+@app.post("/update-driver", response_class=RedirectResponse)
+async def handleUpdateDriver(request: Request):
+    return await updateDriver(request=request)
+
+@app.post("/delete-driver", response_class=RedirectResponse)
+async def handleDeleteDriver(request: Request):
+    return await deleteDriver(request=request)
 
 @app.get("/add-team", response_class=HTMLResponse)
-async def add_team_form(request: Request):
-    id_token = request.cookies.get("token")
-    user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
-    if not user_token:
-        return RedirectResponse(url="/login", status_code=302)
-    return render_user_token(request, user_token, "add_team.html")
+async def addTeamForm(request: Request):
+    return await addTeamFormView(request=request, templates=templates)
 
-@app.post("/add-team")
-async def add_team(
-    request: Request,
-    name: str = Form(...),
-    year_founded: int = Form(...),
-    total_poles: int = Form(...),
-    total_wins: int = Form(...),
-    constructor_titles: int = Form(...),
-    last_finish_position: int = Form(...)
-):
-    team_data = {
-        "Name": name,
-        "YearFounded": year_founded,
-        "TotalPolePositions": total_poles,
-        "TotalRaceWins": total_wins,
-        "TotalConstructorTitles": constructor_titles,
-        "LastSeasonFinish": last_finish_position
-    }
-    firestore_db.collection("teams").add(team_data)
-    return RedirectResponse(url="/", status_code=302)
+@app.post("/add-team", response_class=RedirectResponse)
+async def handleAddTeamPost(request: Request):
+    return await addTeamPost(request=request)
 
-@app.get("/search-drivers", response_class=HTMLResponse)
-async def search_drivers(request: Request, attr: str = "", op: str = "", value: str = ""):
-    id_token = request.cookies.get("token")
-    user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
-    results = perform_driver_query("drivers", attr, op, value)
-    return render_user_token(request, user_token, "search_driver.html", drivers=results, search=attr)
+@app.post("/update-team", response_class=RedirectResponse)
+async def handleUpdateTeam(request: Request):
+    return await updateTeam(request=request)
 
-@app.get("/search-teams", response_class=HTMLResponse)
-async def search_teams(request: Request, attr: str = "", op: str = "", value: str = ""):
-    id_token = request.cookies.get("token")
-    user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
-    results = perform_team_query("teams", attr, op, value)
-    return render_user_token(request, user_token, "search_team.html", teams=results, search=attr)
+@app.post("/delete-team", response_class=RedirectResponse)
+async def handleDeleteTeam(request: Request):
+    return await deleteTeam(request=request)
+
+@app.get("/search", response_class=HTMLResponse)
+async def handleGlobalSearch(request: Request):
+    return await globalSearch(request=request, templates=templates)
+
+@app.get("/query-teams", response_class=HTMLResponse)
+async def handleQueryTeams(request: Request):
+    return await queryTeams(request=request, templates=templates)
+
+@app.get("/driver-info/{driver_id}", response_class=HTMLResponse)
+async def driverInfo(request: Request, driver_id: str):
+    return await viewDriverInfo(driver_id=driver_id, request=request, templates=templates)
+
+@app.get("/driver-info/{driver_id}/edit", response_class=HTMLResponse)
+async def editDriverForm(request: Request, driver_id: str):
+    return await editDriverFormView(driver_id=driver_id, request=request, templates=templates)
+
+@app.get("/team-info/{team_id}", response_class=HTMLResponse)
+async def teamInfo(request: Request, team_id: str):
+    return await viewTeamInfo(team_id=team_id, request=request, templates=templates)
+
+@app.get("/compare-drivers", response_class=HTMLResponse)
+async def compareDrivers(request: Request):
+    return await compareDriversView(request=request, templates=templates)
+
+@app.post("/compare-drivers", response_class=RedirectResponse)
+async def handleCompareDrivers(request: Request):
+    return await compareDriversPost(request=request)
+
+@app.get("/compare-drivers-result", response_class=HTMLResponse)
+async def compareDriversResultRoute(request: Request):
+    return await compareDriversResult(request=request, templates=templates)
+
+@app.get("/compare-teams", response_class=HTMLResponse)
+async def compareTeams(request: Request):
+    return await compareTeamsView(request=request, templates=templates)
+
+@app.post("/compare-teams", response_class=RedirectResponse)
+async def handleCompareTeams(request: Request):
+    return await compareTeamsPost(request=request)
+
+@app.get("/compare-teams-result", response_class=HTMLResponse)
+async def compareTeamsResultRoute(request: Request):
+    return await compareTeamsResult(request=request, templates=templates)
