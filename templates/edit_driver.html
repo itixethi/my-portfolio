@@ -1,0 +1,44 @@
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>Edit Driver: {{ driver.Name }}</h2>
+  <form method="post" action="/update-driver">
+    <input type="hidden" name="id" value="{{ driver.id }}">
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" value="{{ driver.Name }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Age</label>
+        <input type="number" class="form-control" name="age" value="{{ driver.Age }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Pole Positions</label>
+        <input type="number" class="form-control" name="total_pole_positions" value="{{ driver.TotalPolePositions }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Race Wins</label>
+        <input type="number" class="form-control" name="total_race_wins" value="{{ driver.TotalRaceWins }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Points Scored</label>
+        <input type="number" class="form-control" name="total_points_scored" value="{{ driver.TotalPointsScored }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total World Titles</label>
+        <input type="number" class="form-control" name="total_world_titles" value="{{ driver.TotalWorldTitles }}" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Fastest Laps</label>
+        <input type="number" class="form-control" name="total_fastest_laps" value="{{ driver.TotalFastestLaps }}" required>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-4">Update Driver</button>
+  </form>
+</div>
+
+{% include 'abstracts/footer.html' %}
