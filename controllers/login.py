@@ -6,6 +6,7 @@ from google.auth.transport import requests
 
 firebase_request_adapter = requests.Request()
 
+# this is the login function, checks the login and shows the login page
 async def login(request: Request, templates: Jinja2Templates):
     try:
         id_token = request.cookies.get("token")
@@ -14,4 +15,5 @@ async def login(request: Request, templates: Jinja2Templates):
 
         return templates.TemplateResponse(request=request, name="login.html", context={"isAuthorized": isAuthorized, "request": request})
     except Exception as e:
+        
         return HTMLResponse(str(e), status_code=500)
