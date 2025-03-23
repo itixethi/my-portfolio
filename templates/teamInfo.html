@@ -1,0 +1,55 @@
+<!-- teamInfo.html -->
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>{{ team.Name }}</h2>
+
+  <ul class="list-group mb-4">
+    <li class="list-group-item">Year Founded: {{ team.YearFounded }}</li>
+    <li class="list-group-item">Total Pole Positions: {{ team.TotalPolePositions }}</li>
+    <li class="list-group-item">Total Race Wins: {{ team.TotalRaceWins }}</li>
+    <li class="list-group-item">Total Constructor Titles: {{ team.TotalConstructorTitles }}</li>
+    <li class="list-group-item">Last Season Finish: {{ team.LastSeasonFinish }}</li>
+  </ul>
+
+  {% if isAuthorized %}
+  <form method="post" action="/delete-team" class="mb-3">
+    <input type="hidden" name="id" value="{{ team.id }}" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+  </form>
+
+  <form method="post" action="/update-team">
+    <input type="hidden" name="id" value="{{ team.id }}" />
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" value="{{ team.Name }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Year Founded</label>
+        <input type="number" class="form-control" name="year_founded" value="{{ team.YearFounded }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Pole Positions</label>
+        <input type="number" class="form-control" name="total_pole_positions" value="{{ team.TotalPolePositions }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Race Wins</label>
+        <input type="number" class="form-control" name="total_race_wins" value="{{ team.TotalRaceWins }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Constructor Titles</label>
+        <input type="number" class="form-control" name="total_constructor_titles" value="{{ team.TotalConstructorTitles }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Last Season Finish</label>
+        <input type="number" class="form-control" name="last_season_finish" value="{{ team.LastSeasonFinish }}" required />
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Update</button>
+  </form>
+  {% endif %}
+</div>
+
+{% include 'abstracts/footer.html' %}
