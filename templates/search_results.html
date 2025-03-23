@@ -1,0 +1,46 @@
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>Search Drivers or Teams</h2>
+  <form method="get" action="/search" class="row g-3 mb-4">
+    <div class="col-md-10">
+      <input type="text" class="form-control" name="query" placeholder="Enter driver or team name..." required />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+
+  {% if drivers or teams %}
+    <h4>Results for "{{ query }}":</h4>
+
+    {% if drivers %}
+      <h5>Drivers</h5>
+      <ul class="list-group mb-4">
+        {% for driver in drivers %}
+          <li class="list-group-item">
+            <a href="/driver-info/{{ driver.id }}">
+              <strong>{{ driver.Name }}</strong>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
+    {% if teams %}
+      <h5>Teams</h5>
+      <ul class="list-group">
+        {% for team in teams %}
+          <li class="list-group-item">
+            <a href="/team-info/{{ team.id }}">
+              <strong>{{ team.Name }}</strong>
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endif %}
+</div>
+
+{% include 'abstracts/footer.html' %}
