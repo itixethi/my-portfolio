@@ -1,0 +1,65 @@
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>Compare Two Teams</h2>
+
+  {% if error == 'same' %}
+    <div class="alert alert-danger">You cannot compare the same team.</div>
+  {% endif %}
+
+  <form method="post" action="/compare-teams">
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <label for="team1" class="form-label">Select First Team</label>
+        <select class="form-select" id="team1" name="team1" required>
+          {% for team in teams %}
+            <option value="{{ team.id }}">{{ team.Name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <label for="team2" class="form-label">Select Second Team</label>
+        <select class="form-select" id="team2" name="team2" required>
+          {% for team in teams %}
+            <option value="{{ team.id }}">{{ team.Name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary">Compare</button>
+  </form>
+
+  {% if team1 and team2 %}
+  <div class="mt-5">
+    <h3>Team Comparison Results</h3>
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th>Stat</th>
+          <th>{{ team1.Name }}</th>
+          <th>{{ team2.Name }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set stats = [
+          ("Year Founded", team1.YearFounded, team2.YearFounded, "low"),
+          ("Total Pole Positions", team1.TotalPolePositions, team2.TotalPolePositions, "high"),
+          ("Total Race Wins", team1.TotalRaceWins, team2.TotalRaceWins, "high"),
+          ("Total Constructor Titles", team1.TotalConstructorTitles, team2.TotalConstructorTitles, "high"),
+          ("Last Season Finish", team1.LastSeasonFinish, team2.LastSeasonFinish, "low")
+        ] %}
+        {% for label, val1, val2, rule in stats %}
+        <tr>
+          <td>{{ label }}</td>
+          <td class="{% if rule == 'high' and val1 > val2 or rule == 'low' and val1 < val2 %}table-success{% endif %}">{{ val1 }}</td>
+          <td class="{% if rule == 'high' and val2 > val1 or rule == 'low' and val2 < val1 %}table-success{% endif %}">{{ val2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+{% include 'abstracts/footer.html' %}

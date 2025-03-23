@@ -1,0 +1,34 @@
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>Driver Comparison Results</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>Stat</th>
+        <th>{{ driver1.Name }}</th>
+        <th>{{ driver2.Name }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% set stats = [
+        ("Age", driver1.Age, driver2.Age, "low"),
+        ("Total Pole Positions", driver1.TotalPolePositions, driver2.TotalPolePositions, "high"),
+        ("Total Race Wins", driver1.TotalRaceWins, driver2.TotalRaceWins, "high"),
+        ("Total Points Scored", driver1.TotalPointsScored, driver2.TotalPointsScored, "high"),
+        ("Total World Titles", driver1.TotalWorldTitles, driver2.TotalWorldTitles, "high"),
+        ("Total Fastest Laps", driver1.TotalFastestLaps, driver2.TotalFastestLaps, "high")
+      ] %}
+      {% for label, val1, val2, rule in stats %}
+      <tr>
+        <td>{{ label }}</td>
+        <td class="{% if rule == 'high' and val1 > val2 or rule == 'low' and val1 < val2 %}table-success{% endif %}">{{ val1 }}</td>
+        <td class="{% if rule == 'high' and val2 > val1 or rule == 'low' and val2 < val1 %}table-success{% endif %}">{{ val2 }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'abstracts/footer.html' %}
