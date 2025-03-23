@@ -18,25 +18,35 @@ def validateFirebaseToken(id_token, firebase_request_adapter):
         return None
 
 # add a driver to Firestore, preventing duplicates
-def addDriverHelper(name, age, total_pole_positions, total_race_wins, total_points_scored, total_world_titles, total_fastest_laps, team):
-    driver = {
-        "Name": name,
-        "Age": age,
-        "TotalPolePositions": total_pole_positions,
-        "TotalRaceWins": total_race_wins,
-        "TotalPointsScored": total_points_scored,
-        "TotalWorldTitles": total_world_titles,
-        "TotalFastestLaps": total_fastest_laps,
-        "Team": team
-    }
+def addDriverHelper(name, age, total_pole_positions, total_race_wins,
+                    total_points_scored, total_world_titles, total_fastest_laps, team):
     try:
-        existing = firestore_db.collection("drivers").where("Name", "==", name).get()
-        if len(existing) > 0:
-            return HTMLResponse(f"Driver with name {name} already exists", status_code=500)
+        normalized_name = name.strip().lower()
+
+        # Check if a driver with the same lowercase name already exists
+        existing = firestore_db.collection("drivers").where("NameLower", "==", normalized_name).get()
+        if existing:
+            return HTMLResponse(f"Driver named '{name}' already exists.", status_code=400)
+
+        driver = {
+            "Name": name.strip(),
+            "NameLower": normalized_name,
+            "Age": age,
+            "TotalPolePositions": total_pole_positions,
+            "TotalRaceWins": total_race_wins,
+            "TotalPointsScored": total_points_scored,
+            "TotalWorldTitles": total_world_titles,
+            "TotalFastestLaps": total_fastest_laps,
+            "Team": team.strip()
+        }
+
         firestore_db.collection("drivers").add(driver)
         return True
+
     except RefreshError as e:
-        return HTMLResponse(str(e), status_code=503)
+        return HTMLResponse(f"Authentication error: {str(e)}", status_code=503)
+    except Exception as e:
+        return HTMLResponse(f"Unexpected error: {str(e)}", status_code=500)
 
 # get a driver by ID
 def getDriverById(id: str):
