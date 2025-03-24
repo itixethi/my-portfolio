@@ -5,6 +5,7 @@
 <div class="container mt-5">
   <h2>{{ team.Name }}</h2>
 
+  <!-- Display team stats in a list -->
   <ul class="list-group mb-4">
     <li class="list-group-item">Year Founded: {{ team.YearFounded }}</li>
     <li class="list-group-item">Total Pole Positions: {{ team.TotalPolePositions }}</li>
@@ -19,6 +20,7 @@
     <button type="submit" class="btn btn-danger">Delete</button>
   </form>
 
+  <!-- update team form -->
   <form method="post" action="/update-team">
     <input type="hidden" name="id" value="{{ team.id }}" />
     <div class="row g-3">
@@ -52,4 +54,4 @@
   {% endif %}
 </div>
 
-{% include 'abstracts/footer.html' %}
+{% include 'abstracts/footer.html' %} <!-- include footer section -->

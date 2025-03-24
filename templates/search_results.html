@@ -3,6 +3,8 @@
 
 <div class="container mt-5">
   <h2>Search Drivers or Teams</h2>
+
+  <!-- Search form -->
   <form method="get" action="/search" class="row g-3 mb-4">
     <div class="col-md-10">
       <input type="text" class="form-control" name="query" placeholder="Enter driver or team name..." required />
@@ -19,6 +21,7 @@
   {% if drivers or teams %}
     <h4>Results for "{{ query }}":</h4>
 
+    <!-- Display results for drivers or teams if any found -->
     {% if drivers %}
       <h5>Drivers</h5>
       <ul class="list-group mb-4">
@@ -43,6 +46,8 @@
           </li>
         {% endfor %}
       </ul>
+      
+      <!-- if no results, show warnings -->
     {% elif query %}
       <p class="text-muted">No teams matched your search.</p>
     {% endif %}

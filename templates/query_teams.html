@@ -3,6 +3,8 @@
 
 <div class="container mt-5">
   <h2>Query Teams by Attribute</h2>
+
+  <!-- Form to search for teams by attribute, operators and values -->
   <form method="get" action="/query-teams" class="row g-3 mb-4">
     <div class="col-md-4">
       <label for="attribute" class="form-label">Attribute</label>
@@ -31,6 +33,7 @@
     </div>
   </form>
 
+  <!-- Display teams if available or show warning -->
   {% if teams %}
     <h4>Matching Teams:</h4>
     <ul class="list-group">
@@ -47,4 +50,4 @@
   {% endif %}
 </div>
 
-{% include 'abstracts/footer.html' %}
+{% include 'abstracts/footer.html' %} <!-- load footer temp -->
