@@ -4,17 +4,14 @@
 <div class="container mt-5">
   <h2>Compare Two Teams</h2>
 
-  {% if error == 'same' %}
-    <div class="alert alert-danger">You cannot compare the same team.</div>
-  {% endif %}
-
+  <!-- Team comparison form -->
   <form method="post" action="/compare-teams">
     <div class="row mb-3">
       <div class="col-md-6">
         <label for="team1" class="form-label">Select First Team</label>
         <select class="form-select" id="team1" name="team1" required>
           {% for team in teams %}
-            <option value="{{ team.id }}">{{ team.Name }}</option>
+            <option value="{{ team.id }}" {% if team1 and team1.id == team.id %}selected{% endif %}>{{ team.Name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -22,7 +19,7 @@
         <label for="team2" class="form-label">Select Second Team</label>
         <select class="form-select" id="team2" name="team2" required>
           {% for team in teams %}
-            <option value="{{ team.id }}">{{ team.Name }}</option>
+            <option value="{{ team.id }}" {% if team2 and team2.id == team.id %}selected{% endif %}>{{ team.Name }}</option>
           {% endfor %}
         </select>
       </div>
@@ -30,6 +27,7 @@
     <button type="submit" class="btn btn-primary">Compare</button>
   </form>
 
+  <!-- Only display results if both teams are selected and passed in context -->
   {% if team1 and team2 %}
   <div class="mt-5">
     <h3>Team Comparison Results</h3>
@@ -49,6 +47,8 @@
           ("Total Constructor Titles", team1.TotalConstructorTitles, team2.TotalConstructorTitles, "high"),
           ("Last Season Finish", team1.LastSeasonFinish, team2.LastSeasonFinish, "low")
         ] %}
+
+        <!-- Tender comparison rows with green highlight on -->
         {% for label, val1, val2, rule in stats %}
         <tr>
           <td>{{ label }}</td>
