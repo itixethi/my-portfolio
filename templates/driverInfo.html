@@ -1,27 +1,66 @@
-{% include 'abstracts/head.html' %}
-{% include 'abstracts/menu.html' %}
+{% include 'abstracts/head.html' %}  {# Import shared head settings (meta, CSS, etc.) #}
+{% include 'abstracts/menu.html' %} {# Load the navigation menu bar #}
 
 <div class="container mt-5">
-  <h2>{{ driver.Name }}</h2>
-  <div class="card mt-3">
-    <div class="card-body">
-      <p><strong>Age:</strong> {{ driver.Age }}</p>
-      <p><strong>Total Pole Positions:</strong> {{ driver.TotalPolePositions }}</p>
-      <p><strong>Total Race Wins:</strong> {{ driver.TotalRaceWins }}</p>
-      <p><strong>Total Points Scored:</strong> {{ driver.TotalPointsScored }}</p>
-      <p><strong>Total World Titles:</strong> {{ driver.TotalWorldTitles }}</p>
-      <p><strong>Total Fastest Laps:</strong> {{ driver.TotalFastestLaps }}</p>
-      <p><strong>Team:</strong> {{ driver.Team }}</p>
-    </div>
-  </div>
+  <h2>{{ driver.Name }}</h2>  {# Display driver's name as heading #}
 
+  <!-- Display each driver's stat in a clean list -->
+  <ul class="list-group mb-4">
+    <li class="list-group-item">Age: {{ driver.Age }}</li>
+    <li class="list-group-item">Team: {{ driver.Team }}</li>
+    <li class="list-group-item">Total Pole Positions: {{ driver.TotalPolePositions }}</li>
+    <li class="list-group-item">Total Race Wins: {{ driver.TotalRaceWins }}</li>
+    <li class="list-group-item">Total Points Scored: {{ driver.TotalPointsScored }}</li>
+    <li class="list-group-item">Total World Titles: {{ driver.TotalWorldTitles }}</li>
+    <li class="list-group-item">Total Fastest Laps: {{ driver.TotalFastestLaps }}</li>
+  </ul>
+
+  <!-- Show delete and update forms only if user is authorized -->
   {% if isAuthorized %}
-  <form method="post" action="/delete-driver" class="mt-4">
-    <input type="hidden" name="id" value="{{ driver.id }}">
-    <a href="/driver-info/{{ driver.id }}/edit" class="btn btn-warning me-2">Edit</a>
+  <form method="post" action="/delete-driver" class="mb-3">
+    <input type="hidden" name="id" value="{{ driver.id }}" />
     <button type="submit" class="btn btn-danger">Delete</button>
+  </form>
+
+  <form method="post" action="/update-driver">
+    <input type="hidden" name="id" value="{{ driver.id }}" />
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label">Name</label>
+        <input type="text" class="form-control" name="name" value="{{ driver.Name }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Age</label>
+        <input type="number" class="form-control" name="age" value="{{ driver.Age }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Pole Positions</label>
+        <input type="number" class="form-control" name="total_pole_positions" value="{{ driver.TotalPolePositions }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Race Wins</label>
+        <input type="number" class="form-control" name="total_race_wins" value="{{ driver.TotalRaceWins }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Points Scored</label>
+        <input type="number" class="form-control" name="total_points_scored" value="{{ driver.TotalPointsScored }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total World Titles</label>
+        <input type="number" class="form-control" name="total_world_titles" value="{{ driver.TotalWorldTitles }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Total Fastest Laps</label>
+        <input type="number" class="form-control" name="total_fastest_laps" value="{{ driver.TotalFastestLaps }}" required />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Team</label>
+        <input type="text" class="form-control" name="team" value="{{ driver.Team }}" required />
+      </div>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Update</button>
   </form>
   {% endif %}
 </div>
 
-{% include 'abstracts/footer.html' %}
+{% include 'abstracts/footer.html' %} {# Include footer content #}
