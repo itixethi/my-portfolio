@@ -8,6 +8,7 @@
     <div class="alert alert-danger">You cannot compare the same driver. Please select two different drivers.</div>
   {% endif %}
 
+  <!-- form to select two drivers for comparison -->
   <form method="post" action="/compare-drivers">
     <div class="row mb-3">
       <div class="col-md-6">
@@ -29,7 +30,8 @@
     </div>
     <button type="submit" class="btn btn-primary">Compare</button>
   </form>
-
+  
+  <!-- Display comparison table if both drivers are selected and results are available -->
   {% if driver1 and driver2 %}
   <div class="mt-5">
     <h3>Driver Comparison Results</h3>

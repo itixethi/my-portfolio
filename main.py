@@ -17,13 +17,17 @@ from controllers.compare_teams import compareTeamsView, compareTeamsPost, compar
 from controllers.driver import editDriverFormView
 from controllers.query_teams import queryTeams
 
+# i call the app i shall use for my routing
 app = FastAPI()
 firestore_db = firestore.Client()
 firebase_request_adapter = requests.Request()
 
+# i define static and template directories 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 templates = Jinja2Templates(directory="templates")
 
+# This retrieves a user document from Firestore using the Firebase user ID.
+# If the user doesn't exist in the "users" collection, it initializes a default entry.
 def getUser(user_token):
     user = firestore_db.collection("users").document(user_token['user_id'])
     if not user.get().exists:
@@ -31,10 +35,14 @@ def getUser(user_token):
         user.set(user_data)
     return user
 
+# This validates an ID token and returns the corresponding user document from Firestore.
+# If the token is invalid or missing, returns None.
 def checkAndReturnUser(id_token):
     user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
     return getUser(user_token) if user_token else None
 
+# Home route handler, this displays homepage with all drivers and teams.
+# Also determines if the user is logged in by checking for a valid Firebase token.
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
     try:

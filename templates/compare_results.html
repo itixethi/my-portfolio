@@ -12,6 +12,7 @@
       </tr>
     </thead>
     <tbody>
+      <!-- This is a set of stat labels and values, also with highlight rule -->
       {% set stats = [
         ("Age", driver1.Age, driver2.Age, "low"),
         ("Total Pole Positions", driver1.TotalPolePositions, driver2.TotalPolePositions, "high"),
@@ -20,6 +21,8 @@
         ("Total World Titles", driver1.TotalWorldTitles, driver2.TotalWorldTitles, "high"),
         ("Total Fastest Laps", driver1.TotalFastestLaps, driver2.TotalFastestLaps, "high")
       ] %}
+
+      <!-- Tenders stat comparison rows, shows highlights of better value based on rule -->
       {% for label, val1, val2, rule in stats %}
       <tr>
         <td>{{ label }}</td>
@@ -31,4 +34,4 @@
   </table>
 </div>
 
-{% include 'abstracts/footer.html' %}
+{% include 'abstracts/footer.html' %} <!-- footer section lol -->
