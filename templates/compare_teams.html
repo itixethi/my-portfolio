@@ -4,6 +4,10 @@
 <div class="container mt-5">
   <h2>Compare Two Teams</h2>
 
+  {% if error == 'same' %}
+  <div class="alert alert-danger">You cannot compare the same team. Please select two different teams.</div>
+{% endif %}
+
   <!-- Team comparison form -->
   <form method="post" action="/compare-teams">
     <div class="row mb-3">
@@ -48,7 +52,7 @@
           ("Last Season Finish", team1.LastSeasonFinish, team2.LastSeasonFinish, "low")
         ] %}
 
-        <!-- Tender comparison rows with green highlight on -->
+         <!-- Tender comparison rows with green highlight on -->
         {% for label, val1, val2, rule in stats %}
         <tr>
           <td>{{ label }}</td>
