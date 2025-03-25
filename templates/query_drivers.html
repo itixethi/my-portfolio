@@ -1,0 +1,51 @@
+{% include 'abstracts/head.html' %}
+{% include 'abstracts/menu.html' %}
+
+<div class="container mt-5">
+  <h2>Query Drivers by Attribute</h2>
+  <form method="get" action="/query-drivers" class="row g-3 mb-4">
+    <div class="col-md-4">
+      <label for="attribute" class="form-label">Attribute</label>
+      <select class="form-select" id="attribute" name="attribute" required>
+        <option value="Age">Age</option>
+        <option value="TotalPolePositions">Total Pole Positions</option>
+        <option value="TotalRaceWins">Total Race Wins</option>
+        <option value="TotalPointsScored">Total Points Scored</option>
+        <option value="TotalWorldTitles">Total World Titles</option>
+        <option value="TotalFastestLaps">Total Fastest Laps</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <label for="operator" class="form-label">Operator</label>
+      <select class="form-select" id="operator" name="operator" required>
+        <option value="eq">=</option>
+        <option value="gt">&gt;</option>
+        <option value="lt">&lt;</option>
+      </select>
+    </div>
+    <div class="col-md-4">
+      <label for="value" class="form-label">Value</label>
+      <input type="number" class="form-control" id="value" name="value" required />
+    </div>
+    <div class="col-md-2 d-flex align-items-end">
+      <button type="submit" class="btn btn-primary w-100">Search</button>
+    </div>
+  </form>
+
+  {% if drivers %}
+    <h4>Matching Drivers:</h4>
+    <ul class="list-group">
+      {% for driver in drivers %}
+        <li class="list-group-item">
+          <a href="/driver-info/{{ driver.id }}">
+            <strong>{{ driver.Name }}</strong>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  {% elif query_submitted %}
+    <div class="alert alert-warning">No drivers found matching query.</div>
+  {% endif %}
+</div>
+
+{% include 'abstracts/footer.html' %}

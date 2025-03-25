@@ -16,6 +16,7 @@ from controllers.compare import compareDriversView, compareDriversPost, compareD
 from controllers.compare_teams import compareTeamsView, compareTeamsPost, compareTeamsResult
 from controllers.driver import editDriverFormView
 from controllers.query_teams import queryTeams
+from controllers.query_drivers import queryDrivers
 
 # i call the app i shall use for my routing
 app = FastAPI()
@@ -102,6 +103,10 @@ async def handleGlobalSearch(request: Request):
 @app.get("/query-teams", response_class=HTMLResponse)
 async def handleQueryTeams(request: Request):
     return await queryTeams(request=request, templates=templates)
+
+@app.get("/query-drivers", response_class=HTMLResponse)
+async def handleDriverQuery(request: Request):
+    return await queryDrivers(request=request, templates=templates)
 
 @app.get("/driver-info/{driver_id}", response_class=HTMLResponse)
 async def driverInfo(request: Request, driver_id: str):
