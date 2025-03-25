@@ -46,16 +46,19 @@ async def compareTeamsResult(request: Request, templates: Jinja2Templates):
 
     team1_doc = firestore_db.collection("teams").document(team1_id).get()
     team2_doc = firestore_db.collection("teams").document(team2_id).get()
+    
 
     if not team1_doc.exists or not team2_doc.exists:
         return HTMLResponse("One or both teams not found.", status_code=404)
 
     team1 = {"id": team1_id, **team1_doc.to_dict()}
     team2 = {"id": team2_id, **team2_doc.to_dict()}
+    teams = [{"id": doc.id, **doc.to_dict()} for doc in firestore_db.collection("teams").stream()]
 
     return templates.TemplateResponse("compare_teams.html", {
         "request": request,
         "isAuthorized": isAuthorized,
         "team1": team1,
         "team2": team2,
+        "teams": teams
     })
