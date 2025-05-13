@@ -42,7 +42,7 @@ def checkAndReturnUser(id_token):
     user_token = validateFirebaseToken(id_token=id_token, firebase_request_adapter=firebase_request_adapter)
     return getUser(user_token) if user_token else None
 
-# Home route handler, this displays homepage with all drivers and teams.
+# Home route handler, this displays homepage with all drivers and teams.  
 # Also determines if the user is logged in by checking for a valid Firebase token.
 @app.get("/", response_class=HTMLResponse)
 async def root(request: Request):
@@ -143,3 +143,4 @@ async def handleCompareTeams(request: Request):
 @app.get("/compare-teams-result", response_class=HTMLResponse)
 async def compareTeamsResultRoute(request: Request):
     return await compareTeamsResult(request=request, templates=templates)
+    
